@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/styles.css" />
+        <title>Ett Bibliotek</title>
+    </head>
+    <body>
+        <header>
+            <div><h2>Ett Bibliotek</h2></div>
+            <nav>
+                <a class="active" href="/">Start</a>
+                <a href="/chat">Chatt</a>
+                <a href="/search">Sök</a>
+                <a href="/create">Lägg till bok</a>
+            </nav>
+        </header>
+        <main>
+            <h1>Alla böcker</h1>
+            <table id="all-books-table">
+                <tr>
+                    <th>Titel</th>
+                    <th>Författare</th>
+                    <th>Genre</th>
+                    <th>År</th>
+                    <th>Utlånade</th>
+                    <th>Tillgängliga</th>
+                </tr>
+            </table>
+            <script>
+                window.onload = showAllBooks()
+
+                async function showAllBooks() {
+                    const allBooksTable =
+                        document.querySelector('#all-books-table')
+                    let data = await getAllBooks()
+                    for (const book of data) {
+                        let bookId = book.bookId
+                        let availability = await getBookAvailability(bookId)
+                        let row = document.createElement('tr')
+                        let bookAvailability = book.availability
+                        if (!bookAvailability) {
+                            row.classList = 'not-available'
+                        }
+                        row.id = book.bookId
+                        row.innerHTML = `<td>${book.title}</td>
+                        <td>${book.author}</td>
+                        <td>${book.genre}</td>
+                        <td>${book.year}</td>
+                        <td>${availability[0].borrowed}</td>
+                        <td>${availability[0].available}</td>`
+                        allBooksTable.appendChild(row)
+                    }
+                }
+
+                async function getAllBooks() {
+                    const response = await fetch(
+                        'http://localhost:3001/library/'
+                    )
+                    const data = await response.json()
+                    return data
+                }
+
+                async function getBookAvailability(bookId) {
+                    const response = await fetch(
+                        `http://localhost:3001/library/availability/${bookId}`
+                    )
+                    const data = await response.json()
+                    return data
+                }
+            </script>
+        </main>
+    </body>
+</html>

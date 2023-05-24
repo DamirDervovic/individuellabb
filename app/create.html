@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/styles.css" />
+        <title>Ett Bibliotek</title>
+    </head>
+    <body>
+        <header>
+            <div><h2>Ett Bibliotek</h2></div>
+            <nav>
+                <a href="/">Start</a>
+                <a href="/chat">Chatt</a>
+                <a href="/search">Sök</a>
+                <a class="active" href="/create">Lägg till bok</a>
+            </nav>
+        </header>
+        <main>
+            <h1>Lägg till en bok till biblioteket</h1>
+            <div>
+                <label for="title">Titel</label>
+                <input id="title" type="text" name="title" autofocus />
+                <label for="author">Författare</label>
+                <input id="author" type="text" name="author" />
+                <label for="genre">Genre</label>
+                <input id="genre" type="text" name="genre" />
+                <label for="year"></label>År
+                <input id="year" type="text" name="year" />
+                <button id="add-btn" type="submit">Spara</button>
+            </div>
+            <div class="feedback"></div>
+        </main>
+
+        <script>
+            const addBtn = document.querySelector('#add-btn')
+            const title = document.querySelector('#title')
+            const author = document.querySelector('#author')
+            const genre = document.querySelector('#genre')
+            const year = document.querySelector('#year')
+            const feedback = document.querySelector('.feedback')
+
+            addBtn.addEventListener('click', () => {
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title.value,
+                        author: author.value,
+                        genre: genre.value,
+                        year: year.value
+                    })
+                }
+
+                fetch('http://localhost:3001/library/add', options)
+                    .then((response) => console.log(response), addFeedback())
+                    .catch((error) => console.error(error))
+            })
+
+            function addFeedback() {
+                let a = document.createElement('a')
+                let p = document.createElement('p')
+
+                p.innerText = title.value + ' tillagd'
+                a.innerText = 'OK'
+                feedback.appendChild(p)
+                feedback.appendChild(a)
+
+                a.addEventListener('click', () => {
+                    location.reload()
+                })
+            }
+        </script>
+    </body>
+</html>

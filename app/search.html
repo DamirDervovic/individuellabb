@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/styles.css" />
+        <title>Ett Bibliotek</title>
+    </head>
+    <body>
+        <header>
+            <div><h2>Ett Bibliotek</h2></div>
+            <nav>
+                <a href="/">Start</a>
+                <a href="/chat">Chatt</a>
+                <a class="active" href="/search">Sök</a>
+                <a href="/create">Lägg till bok</a>
+            </nav>
+        </header>
+        <main>
+            <h1>Sök böcker</h1>
+            <p>Du kan söka på boktitel eller författare</p>
+            <div class="search-container">
+                <input
+                    type="radio"
+                    id="radio-title"
+                    name="radio-option"
+                    value="title"
+                    checked
+                />
+                <label for="radio-title">Boktitel</label>
+
+                <input
+                    type="radio"
+                    id="radio-author"
+                    name="radio-option"
+                    value="author"
+                />
+                <label for="radio-author">Författare</label>
+                <input id="keyword" type="text" />
+                <button id="search-btn">Sök</button>
+            </div>
+
+            <ul id="searchResults"></ul>
+
+            <div class="update-hidden">
+                <input id="bookId" type="hidden" name="bookId" />
+                <label for="title">Titel</label>
+                <input id="title" type="text" name="title" autofocus />
+                <label for="author">Författare</label>
+                <input id="author" type="text" name="author" />
+                <label for="genre">Genre</label>
+                <input id="genre" type="text" name="genre" />
+                <label for="year">År</label>
+                <input id="year" type="text" name="year" />
+                <label for="borrowed">Utlånade ex.</label>
+                <select name="borrowed" id="borrowed">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+                <label for="available">Tillgängliga ex.</label>
+                <select name="available" id="available">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+                <button id="update-btn" type="submit">Spara</button>
+            </div>
+        </main>
+        <script>
+            const searchBtn = document.querySelector('#search-btn')
+            const updateBtn = document.querySelector('#update-btn')
+
+            searchBtn.addEventListener('click', () => {
+                const keyword = document.querySelector('#keyword').value.trim()
+                if (keyword !== '') {
+                    showResults()
+                } else {
+                    clearResults()
+                }
+            })
+
+            async function getResultsByKeyword() {
+                let keyword = document.querySelector('#keyword').value
+                let radioTitle = document.querySelector('#radio-title')
+                let radioAuthor = document.querySelector('#radio-author')
+                let radioChecked
+
+                if (radioTitle.checked) {
+                    radioChecked = radioTitle.value
+                } else if (radioAuthor.checked) {
+                    radioChecked = radioAuthor.value
+                }
+
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json'
+                    }
+                }
+                let column = radioChecked === 'title' ? 'title' : 'author'
+                let response = await fetch(
+                    'http://localhost:3001/library/search?' +
+                        new URLSearchParams({
+                            keyword: keyword,
+                            column: column
+                        }),
+                    options
+                ).catch((error) => {
+                    console.error(error)
+                })
+
+                let data = await response.json()
+
+                return data
+            }
+            async function getBookAvailability(bookId) {
+                const response = await fetch(
+                    `http://localhost:3001/library/availability/${bookId}`
+                )
+                const data = await response.json()
+                return data
+            }
+
+            async function showResults() {
+                const results = document.querySelector('#searchResults')
+                results.innerHTML = ''
+                let data = await getResultsByKeyword()
+
+                for (const book of data) {
+                    let bookId = book.bookId
+                    let availability = await getBookAvailability(bookId)
+                    let li = document.createElement('li')
+                    let editLink = document.createElement('a')
+                    let deleteLink = document.createElement('a')
+
+                    li.innerText = book.title + ', ' + book.author
+                    editLink.innerText = 'Ändra'
+                    deleteLink.innerText = 'Ta bort'
+                    li.appendChild(editLink)
+                    li.appendChild(deleteLink)
+                    results.appendChild(li)
+
+                    editLink.addEventListener('click', () => {
+                        document.querySelector('#bookId').value = book.bookId
+                        document.querySelector('#title').value = book.title
+                        document.querySelector('#author').value = book.author
+                        document.querySelector('#genre').value = book.genre
+                        document.querySelector('#year').value = book.year
+                        document.querySelector('#borrowed').value =
+                            availability[0].borrowed
+                        document.querySelector('#available').value =
+                            availability[0].available
+                        displayUpdate()
+                    })
+
+                    deleteLink.addEventListener('click', () => {
+                        document.querySelector('#bookId').value = book.bookId
+                        deleteBook()
+                        clearResults()
+
+                        let a = document.createElement('a')
+                        let p = document.createElement('p')
+                        p.innerText = book.title + ' togs bort'
+                        a.innerText = 'OK'
+                        results.appendChild(p)
+                        results.appendChild(a)
+
+                        a.addEventListener('click', () => {
+                            location.reload()
+                        })
+                    })
+                }
+            }
+
+            function displayUpdate() {
+                const search = document.querySelector('.search-container')
+                search.className = 'search-hidden'
+                clearResults()
+
+                const update = document.querySelector('.update-hidden')
+                update.className = 'update'
+            }
+
+            updateBtn.addEventListener('click', () => {
+                let bookId = document.querySelector('#bookId')
+                let title = document.querySelector('#title')
+                let author = document.querySelector('#author')
+                let genre = document.querySelector('#genre')
+                let year = document.querySelector('#year')
+                let borrowed = document.querySelector('#borrowed')
+                let available = document.querySelector('#available')
+                let availability = Boolean
+
+                if (available.value > 0) {
+                    availability = true
+                } else {
+                    availability = false
+                }
+
+                const options = {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        bookId: bookId.value,
+                        title: title.value,
+                        author: author.value,
+                        genre: genre.value,
+                        year: year.value,
+                        availability: availability,
+                        borrowed: borrowed.value,
+                        available: available.value
+                    })
+                }
+
+                fetch('http://localhost:3001/library/edit', options)
+                    .then((response) => location.reload())
+                    .catch((error) => console.error(error))
+            })
+
+            function deleteBook() {
+                const options = {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ bookId: bookId.value })
+                }
+
+                fetch('http://localhost:3001/library/remove', options)
+                    .then((response) => console.log(response))
+                    .catch((error) => console.error(error))
+            }
+
+            function clearResults() {
+                const results = document.querySelector('#searchResults')
+                results.innerHTML = ''
+            }
+        </script>
+    </body>
+</html>

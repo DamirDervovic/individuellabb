@@ -1,0 +1,125 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background-color: #f2f2f2;
+    padding: 10px;
+}
+
+nav {
+    margin-top: 10px;
+}
+
+nav a {
+    text-decoration: none;
+    margin-right: 10px;
+    color: #333;
+}
+
+nav a.active {
+    font-weight: bold;
+}
+
+main {
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+input[type='text'],
+input[type='number'] {
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 8px 16px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+.feedback {
+    margin-top: 20px;
+}
+
+.feedback p {
+    margin-bottom: 10px;
+}
+
+.feedback a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.feedback a:hover {
+    color: #555;
+}
+
+#all-books-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#all-books-table th,
+#all-books-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+#all-books-table th {
+    background-color: #f2f2f2;
+}
+
+#all-books-table .not-available {
+    background-color: #ffcccc;
+}
+
+ul,
+li {
+    list-style-type: none;
+    margin-bottom: 8px;
+}
+
+li a {
+    padding: 8px 16px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    margin-left: 8px;
+}
+
+.chat-server-message {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.update {
+    display: block;
+}
+
+.update-hidden {
+    display: none;
+}
+
+.search-container {
+    display: block;
+}
+
+.search-hidden {
+    display: none;
+}

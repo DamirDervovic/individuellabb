@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/styles.css" />
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/chat.js" defer></script>
+        <title>Ett Bibliotek</title>
+    </head>
+    <body>
+        <header>
+            <div><h2>Ett Bibliotek</h2></div>
+            <nav>
+                <a href="/">Start</a>
+                <a class="active" href="/chat">Chatt</a>
+                <a href="/search">Sök</a>
+                <a href="/create">Lägg till bok</a>
+            </nav>
+        </header>
+        <main>
+            <h1>Chatta med en bibliotekarie</h1>
+            <div class="chat-message-box">
+                <div class="server-message"></div>
+                <div class="message"></div>
+            </div>
+            <input id="chat-message" type="text" placeholder="..." />
+            <button id="chat-btn">Skicka</button>
+        </main>
+    </body>
+</html>
